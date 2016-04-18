@@ -4,7 +4,7 @@
 
 `prepare.py` compiles `DAO.sol` and populates some helper variables inside `prepare.js`
 
-1. `loadScript("prepare.js")` loads these variables into geth.
+1. `loadScript("prepare.py")` loads these variables into geth.
 2. `loadScript("deploy.js")` deploys them.
 
 ## Example usage
