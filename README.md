@@ -4,6 +4,11 @@
 ## What is it?
 A generic DAO (Decentralized Autonomous Organization) framework written in Solidity to run on the Ethereum blockchain. 
 
+The DAOhub.org guys have established an instance of this contract incorporating the public key 0xbb9bc244d798123fde783fcc1c72d3bb8c189413
+
+DO NOT SEND ETH TO THIS ADDRESS DIRECTLY FROM AN EXCHANGE
+USE THE ETHEREUM WALLET OR FOLLOW THE WIZARD FOUND AT DAOHUB.ORG
+
 Feel free to reuse to create your own Decentralized Autonomous Organization using this framework.
 
 **Reference:** *"Decentralized autonomous organization to automate governance" -* [White Paper](https://download.slock.it/public/DAO/WhitePaper.pdf) - [Primer](https://blog.slock.it/a-primer-to-the-decentralized-autonomous-organization-dao-69fb125bd3cd)
