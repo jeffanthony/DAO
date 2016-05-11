@@ -17,7 +17,7 @@ along with the DAO.  If not, see <http://www.gnu.org/licenses/>.
 
 import "./DAO.sol";
 
-contract DTHPoolInterface is Token {
+contract DTHPoolInterface {
 
     // Max time the tokens can be blocked.
     // The real voting in the DAO will be called in the last moment in order
