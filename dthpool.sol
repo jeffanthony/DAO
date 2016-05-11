@@ -15,7 +15,7 @@ You should have received a copy of the GNU lesser General Public License
 along with the DAO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "./DAO.sol";
+import "DAO.sol";
 
 contract DTHPoolInterface {
 
@@ -133,7 +133,7 @@ contract DTHPool is DTHPoolInterface {
 
     function undelegateDAOTokens(uint _amount) returns (bool _success) {
 
-        if (_amount > balances[msg.sender]) throw;
+        if (_amount > balanceOf[msg.sender]) throw;
 
         if (!dao.transfer(msg.sender, _amount)) {
             throw;
@@ -153,9 +153,10 @@ contract DTHPool is DTHPoolInterface {
 
         if (proposalStatus.voteSet) throw;
 
-        var (,,votingDeadline,,,,,,,,) = dao.proposals(_proposalID);
+        var (,,votingDeadline, ,,,,newDelegator,,,) = dao.proposals(_proposalID);
 
         if (votingDeadline < now) throw;
+        if (newDelegator) throw;
 
         proposalStatus.voteSet = true;
         proposalStatus.doVote = _doVote;
