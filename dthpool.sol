@@ -43,7 +43,7 @@ contract DTHPoolInterface {
         bool voteSet;
 
         // True if the proposal should ve voted
-        bool doVote;
+        bool willVote;
 
         // True if the proposal should be accepted.
         bool suportProposal;
@@ -83,9 +83,9 @@ contract DTHPoolInterface {
     /// @notice This method will be called by the delegate to publish what will
     /// be his vote in a specific proposal.
     /// @param _proposalID The proposal to set the vote.
-    /// @param _doVote _doVote If the proposal will be voted.
+    /// @param _willVote true If the proposal will be voted.
     /// @param _supportsProposal What will be the vote.
-    function setVoteIntention(uint _proposalID, bool _doVote, bool _supportsProposal) returns (bool _success);
+    function setVoteIntention(uint _proposalID, bool _willVote, bool _supportsProposal) returns (bool _success);
 
     /// @notice This method will be do the actual voting in the DAO
     /// for the _proposalID
@@ -106,7 +106,7 @@ contract DTHPoolInterface {
     event Undelegate(address indexed _from, uint256 _amount);
 
     /// @notice Called when the delegate set se vote intention
-    event VoteIntentionSet(uint indexed _proposalID, bool _doVote, bool _supportsProposal);
+    event VoteIntentionSet(uint indexed _proposalID, bool _willVote, bool _supportsProposal);
 
     /// @notice Called when the vote is executed in the DAO
     event VoteExecuted(uint indexed _proposalID);
@@ -145,7 +145,7 @@ contract DTHPool is DTHPoolInterface {
         return true;
     }
 
-    function setVoteIntention(uint _proposalID, bool _doVote, bool _supportsProposal) returns (bool _success) {
+    function setVoteIntention(uint _proposalID, bool _willVote, bool _supportsProposal) returns (bool _success) {
 
         if (msg.sender != delegate) throw;
 
@@ -159,15 +159,15 @@ contract DTHPool is DTHPoolInterface {
         if (newCurator) throw;
 
         proposalStatus.voteSet = true;
-        proposalStatus.doVote = _doVote;
+        proposalStatus.willVote = _willVote;
         proposalStatus.suportProposal = _supportsProposal;
         proposalStatus.votingDeadline = votingDeadline;
 
-        if ( ! _doVote) {
+        if ( ! _willVote) {
             proposalStatus.executed = true;
         }
 
-        VoteIntentionSet(_proposalID, _doVote, _supportsProposal);
+        VoteIntentionSet(_proposalID, _willVote, _supportsProposal);
 
         bool finalized = executeVote(_proposalID);
 
@@ -185,7 +185,7 @@ contract DTHPool is DTHPoolInterface {
 
         if ( now < proposalStatus.votingDeadline - maxTimeBlocked) return false;
         if ( now > proposalStatus.votingDeadline) return true;
-        if ( ! proposalStatus.doVote) return true;
+        if ( ! proposalStatus.willVote) return true;
         if ( proposalStatus.executed) return true;
 
         dao.vote(_proposalID, proposalStatus.suportProposal);
