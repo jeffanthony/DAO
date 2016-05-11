@@ -25,32 +25,21 @@ import "./DAO.sol";
 
 contract SampleOffer {
 
-    uint totalCosts;
-    uint oneTimeCosts;
-    uint dailyCosts;
+    uint public totalCosts;
+    uint public oneTimeCosts;
+    uint public dailyWithdrawLimit;
 
+    address public contractor;
+    bytes32 public IPFSHashOfTheProposalDocument;
+    uint public minDailyWithdrawLimit;
+    uint public paidOut;
 
-    address contractor;
-    bytes32 hashOfTheTerms;
-    uint minDailyCosts;
-    uint paidOut;
+    uint public dateOfSignature;
+    DAO public client; // address of DAO
+    bool public isContractValid;
 
-    uint dateOfSignature;
-    DAO client; // address of DAO
-
-    bool public promiseValid;
     uint public rewardDivisor;
     uint public deploymentReward;
-
-    modifier callingRestriction {
-        if (promiseValid) {
-            if (msg.sender != address(client))
-                throw;
-        } else if (msg.sender != contractor) {
-                throw;
-        }
-        _
-    }
 
     modifier onlyClient {
         if (msg.sender != address(client))
@@ -60,21 +49,17 @@ contract SampleOffer {
 
     function SampleOffer(
         address _contractor,
-        bytes32 _hashOfTheTerms,
+        bytes32 _IPFSHashOfTheProposalDocument,
         uint _totalCosts,
         uint _oneTimeCosts,
-        uint _minDailyCosts,
-        uint _rewardDivisor,
-        uint _deploymentReward
+        uint _minDailyWithdrawLimit
     ) {
         contractor = _contractor;
-        hashOfTheTerms = _hashOfTheTerms;
+        IPFSHashOfTheProposalDocument = _IPFSHashOfTheProposalDocument;
         totalCosts = _totalCosts;
         oneTimeCosts = _oneTimeCosts;
-        minDailyCosts = _minDailyCosts;
-        dailyCosts = _minDailyCosts;
-        rewardDivisor = _rewardDivisor;
-        deploymentReward = _deploymentReward;
+        minDailyWithdrawLimit = _minDailyWithdrawLimit;
+        dailyWithdrawLimit = _minDailyWithdrawLimit;
     }
 
     function sign() {
@@ -84,41 +69,37 @@ contract SampleOffer {
             throw;
         client = DAO(msg.sender);
         dateOfSignature = now;
-        promiseValid = true;
+        isContractValid = true;
     }
 
-    function setDailyCosts(uint _dailyCosts) onlyClient {
-        dailyCosts = _dailyCosts;
-        if (dailyCosts < minDailyCosts)
-            promiseValid = false;
+    function setDailyCosts(uint _dailyWithdrawLimit) onlyClient {
+        if (dailyWithdrawLimit >= minDailyWithdrawLimit)
+            dailyWithdrawLimit = _dailyWithdrawLimit;
     }
 
+    // "fire the contractor"
     function returnRemainingMoney() onlyClient {
-        if (client.receiveEther.value(this.balance)())
-            promiseValid = false;
+        if (client.DAOrewardAccount().call.value(this.balance)())
+            isContractValid = false;
     }
 
     function getDailyPayment() {
         if (msg.sender != contractor)
             throw;
-        uint amount = (now - dateOfSignature) / (1 days) * dailyCosts - paidOut;
+        uint amount = (now - dateOfSignature) / (1 days) * dailyWithdrawLimit - paidOut;
         if (contractor.send(amount))
             paidOut += amount;
     }
 
-    function setRewardDivisor(uint _rewardDivisor) callingRestriction {
-        if (_rewardDivisor < 50)
-            throw; // 2% is the default max reward
+    function setRewardDivisor(uint _rewardDivisor) onlyClient {
         rewardDivisor = _rewardDivisor;
     }
 
-    function setDeploymentFee(uint _deploymentReward) callingRestriction {
-        if (deploymentReward > 10 ether)
-            throw; // TODO, set a max defined by Curator, or ideally oracle (set in euro)
+    function setDeploymentFee(uint _deploymentReward) onlyClient {
         deploymentReward = _deploymentReward;
     }
 
-    function updateClientAddress(DAO _newClient) callingRestriction {
+    function updateClientAddress(DAO _newClient) onlyClient {
         client = _newClient;
     }
 
@@ -126,35 +107,20 @@ contract SampleOffer {
     function payOneTimeReward() returns(bool) {
         if (msg.value < deploymentReward)
             throw;
-        if (promiseValid) {
-            if (client.DAOrewardAccount().call.value(msg.value)()) {
-                return true;
-            } else {
-                throw;
-            }
+
+        if (client.DAOrewardAccount().call.value(msg.value)()) {
+            return true;
         } else {
-            if (contractor.send(msg.value)) {
-                return true;
-            } else {
-                throw;
-            }
+            throw;
         }
     }
 
     // pay reward
     function payReward() returns(bool) {
-        if (promiseValid) {
-            if (client.DAOrewardAccount().call.value(msg.value)()) {
-                return true;
-            } else {
-                throw;
-            }
+        if (client.DAOrewardAccount().call.value(msg.value)()) {
+            return true;
         } else {
-            if (contractor.send(msg.value)) {
-                return true;
-            } else {
-                throw;
-            }
+            throw;
         }
     }
 }
