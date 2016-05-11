@@ -153,10 +153,10 @@ contract DTHPool is DTHPoolInterface {
 
         if (proposalStatus.voteSet) throw;
 
-        var (,,votingDeadline, ,,,,newDelegator,,,) = dao.proposals(_proposalID);
+        var (,,votingDeadline, ,,,,newCurator,,,) = dao.proposals(_proposalID);
 
         if (votingDeadline < now) throw;
-        if (newDelegator) throw;
+        if (newCurator) throw;
 
         proposalStatus.voteSet = true;
         proposalStatus.doVote = _doVote;
