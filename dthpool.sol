@@ -15,7 +15,7 @@ You should have received a copy of the GNU lesser General Public License
 along with the DAO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "DAO.sol";
+import "./DAO.sol";
 
 contract DTHPoolInterface is Token {
 
