@@ -14,7 +14,7 @@ To delegate the votes the DTH needs to call this two functions in two separated 
 Once the delegation is finished, you will exchange normal DAO tokens ( Ð ) by the same
 number of delegate dao tokens ( dÐ ) .
 
-It is convenient that in mist you wathch both contracts and both tokens.
+It is convenient that in mist you watch both contracts and both tokens.
 
 ### Undelegate the votes
 
